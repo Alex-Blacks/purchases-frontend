@@ -2,38 +2,87 @@
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 
-const greetMsg = ref("");
-const name = ref("");
+const newUserName = ref('');
+const newUserPassword = ref('');
+const newUserEmail = ref('');
 
-async function greet() {
-  // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  greetMsg.value = await invoke("greet", { name: name.value });
+const loginEmail = ref("");
+const loginPassword = ref("");
+const token = ref("");
+
+const storeName = ref('');
+const createStoreResult = ref('');
+const userResult = ref('');
+
+async function handleCreateUser() {
+  try {
+    const result = await invoke('create_user', {
+      name: newUserName.value,
+      password: newUserPassword.value,
+      email: newUserEmail.value,
+      role: 'user'
+    });
+    userResult.value = `Пользователь создан: ${JSON.stringify(result)}`;
+  } catch (error) {
+    userResult.value = `Ошибка: ${error}`;
+  }
+}
+
+async function handleLogin() {
+  try {
+    const result = await invoke('login', { 
+      email: loginEmail.value, 
+      password: loginPassword.value
+    });
+    token.value = t as string;
+    userResult.value = `Успешный вход! Токен: ${token.value}`;
+  } catch (error) {
+    userResult.value = `Ошибка входа: ${error}`;
+  }
+}
+
+async function handleCreateStore() {
+  try {
+    const result = await invoke('create_store', {
+      token: token.value,
+      name: storeName.value
+    });
+    createStoreResult.value = `Магазин создан: ${JSON.stringify(store)}`;
+  } catch (error) {
+    createStoreResult.value = `Ошибка: ${error}`;
+  } 
 }
 </script>
 
 <template>
-  <main class="container">
-    <h1>Welcome to Tauri + Vue</h1>
-
-    <div class="row">
-      <a href="https://vite.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
+  <div style="display:flex; flex-direction: column; gap: 20px; padding: 20px">
+    <div>
+      <h3>Создать пользователя</h3>
+      <input v-model="newUserName" placeholder="Имя" />
+      <input v-model="newUserPassword" placeholder="Пароль" type="password" />
+      <input v-model="newUserEmail" placeholder="Email" />
+      <button @click="handleCreateUser">Создать</button>
+      <p>{{ userResult }}</p>
     </div>
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
+    
+    <div>
+      <h3>Вход</h3>
+      <input v-model="loginEmail" placeholder="Email" />
+      <input v-model="loginPassword" placeholder="Пароль" type="password" />
+      <button @click="handleLogin">Войти</button>
+    </div>
 
-    <form class="row" @submit.prevent="greet">
-      <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-      <button type="submit">Greet</button>
-    </form>
-    <p>{{ greetMsg }}</p>
-  </main>
+    <div>
+      <h3>Создать магазин</h3>
+      <input v-model="storeName" placeholder="Название магазина" />
+      <button @click="handleCreateStore">Создать магазин</button>
+      <p>{{ createStoreResult }}</p>
+    </div>
+
+    <div v-if="token">
+      <p><strong>Текущий токен:</strong> {{ token }}</p>
+    </div>
+  </div>
 </template>
 
 <style scoped>
