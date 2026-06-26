@@ -33,7 +33,17 @@ pub struct CreateStoreRequest{
     pub name: String
 }
 
-#[derive(Debug,Deserialize, Serialize, Clone)]
+#[derive(Serialize)]
+pub struct GetStoreRequest{
+    pub id: u64
+}
+
+#[derive(Serialize)]
+pub struct DeleteStoreRequest{
+    pub id: u64
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct StoreResponse{
     pub id: u64,
     pub name: String
@@ -44,72 +54,111 @@ pub struct ApiClient{
     client: Client,
 }
 
-impl ApiClient{
-    pub fn new(base_url: String) -> Self{
+impl ApiClient {
+    pub fn new(base_url: String) -> Self {
         Self {
-            base_url, 
+            base_url,
             client: Client::new(),
         }
     }
 
-    pub async fn create_user(&self, name: &str, password: &str, email: &str, role: &str) -> anyhow::Result<UserResponse> {
+    pub async fn create_user(
+        &self,
+        name: &str,
+        password: &str,
+        email: &str,
+        role: &str,
+    ) -> anyhow::Result<UserResponse> {
         let url = format!("{}/api/users", self.base_url);
-        let user_data = CreateUserRequest{
+        let user_data = CreateUserRequest {
             name: name.to_string(),
             password: password.to_string(),
             email: email.to_string(),
-            role: role.to_string()
+            role: role.to_string(),
         };
 
-        let response: UserResponse = self
-            .client
+        let response = self.client
             .post(&url)
             .json(&user_data)
             .send()
-            .await?
-            .error_for_status()?
-            .json()
             .await?;
 
-        Ok(response)
-    }   
-    
+        // Проверяем статус вручную
+        if !response.status().is_success() {
+            let status = response.status();
+            let error_body = response.text().await.unwrap_or_else(|_| "No error body".to_string());
+            anyhow::bail!("HTTP {}: {}", status, error_body);
+        }
+
+        let user: UserResponse = response.json().await?;
+        Ok(user)
+    }
+
     pub async fn login(&self, email: &str, password: &str) -> anyhow::Result<String> {
-        let url = format!("{}/api/login",self.base_url);
-        let login_data = LoginRequest{
+        let url = format!("{}/api/login", self.base_url);
+        let login_data = LoginRequest {
             email: email.to_string(),
-            password: password.to_string()
+            password: password.to_string(),
         };
-        let response: AuthResponse = self
-            .client
+
+        let response = self.client
             .post(&url)
             .json(&login_data)
             .send()
-            .await?
-            .error_for_status()?
-            .json()
             .await?;
 
-        Ok(response.token)
+        if !response.status().is_success() {
+            let status = response.status();
+            let error_body = response.text().await.unwrap_or_else(|_| "No error body".to_string());
+            anyhow::bail!("HTTP {}: {}", status, error_body);
+        }
+
+        let auth: AuthResponse = response.json().await?;
+        Ok(auth.token)
     }
 
-    pub async fn create_store(&self, token:&str ,name: String) -> anyhow::Result<StoreResponse> {
-        let url = format!("{}/api/private/stores",self.base_url);
-        let store_data = CreateStoreRequest{ name };
-        let store: StoreResponse = self
-            .client
+    pub async fn create_store(&self, token: &str, name: String) -> anyhow::Result<StoreResponse> {
+        let url = format!("{}/api/private/stores", self.base_url);
+        let store_data = CreateStoreRequest { name };
+
+        let response = self.client
             .post(&url)
             .json(&store_data)
             .bearer_auth(token)
             .send()
-            .await?
-            .error_for_status()?
-            .json()
-            .await?;   
+            .await?;
+
+        if !response.status().is_success() {
+            let status = response.status();
+            let error_body = response.text().await.unwrap_or_else(|_| "No error body".to_string());
+            anyhow::bail!("HTTP {}: {}", status, error_body);
+        }
+
+        let store: StoreResponse = response.json().await?;
+        Ok(store)
+    }
+
+    pub async fn get_store(&self, token: &str, id: u64) -> anyhow::Result<StoreResponse> {
+        let url = format!("{}/api/private/stores", self.base_url);
+        let store_data = GetStoreRequest { id };
+
+        let response = self.client
+            .post(&url)
+            .json(&store_data)
+            .bearer_auth(token)
+            .send()
+            .await?;
+
+        if !response.status().is_success() {
+            let status = response.status();
+            let error_body = response.text().await.unwrap_or_else(|_| "No error body".to_string());
+            anyhow::bail!("HTTP {}: {}", status, error_body);
+        }
+
+        let store: StoreResponse = response.json().await?;
         Ok(store)
     }
 }
-
 pub struct AppState {
     client: ApiClient,
 }

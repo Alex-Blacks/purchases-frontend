@@ -34,7 +34,7 @@ async function handleLogin() {
       email: loginEmail.value, 
       password: loginPassword.value
     });
-    token.value = t as string;
+    token.value = result as string;
     userResult.value = `Успешный вход! Токен: ${token.value}`;
   } catch (error) {
     userResult.value = `Ошибка входа: ${error}`;
@@ -47,40 +47,46 @@ async function handleCreateStore() {
       token: token.value,
       name: storeName.value
     });
-    createStoreResult.value = `Магазин создан: ${JSON.stringify(store)}`;
+    createStoreResult.value = `Магазин создан: ${JSON.stringify(result)}`;
   } catch (error) {
     createStoreResult.value = `Ошибка: ${error}`;
   } 
 }
 </script>
-
 <template>
-  <div style="display:flex; flex-direction: column; gap: 20px; padding: 20px">
-    <div>
-      <h3>Создать пользователя</h3>
-      <input v-model="newUserName" placeholder="Имя" />
-      <input v-model="newUserPassword" placeholder="Пароль" type="password" />
-      <input v-model="newUserEmail" placeholder="Email" />
-      <button @click="handleCreateUser">Создать</button>
-      <p>{{ userResult }}</p>
-    </div>
-    
-    <div>
+  <div style="padding: 20px; font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+    <h1>📦 Заказы</h1>
+
+    <!-- БЛОК ЛОГИНА -->
+    <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
       <h3>Вход</h3>
-      <input v-model="loginEmail" placeholder="Email" />
-      <input v-model="loginPassword" placeholder="Пароль" type="password" />
+      <input v-model="loginEmail" placeholder="Email" style="display:block; margin-bottom:8px; width:100%;" />
+      <input v-model="loginPassword" placeholder="Пароль" type="password" style="display:block; margin-bottom:8px; width:100%;" />
       <button @click="handleLogin">Войти</button>
+      <p style="margin-top:8px; white-space:pre-wrap;">{{ loginResult }}</p>
     </div>
 
-    <div>
+    <!-- БЛОК СОЗДАНИЯ ПОЛЬЗОВАТЕЛЯ -->
+    <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+      <h3>Создать пользователя</h3>
+      <input v-model="newName" placeholder="Имя" style="display:block; margin-bottom:8px; width:100%;" />
+      <input v-model="newPassword" placeholder="Пароль" type="password" style="display:block; margin-bottom:8px; width:100%;" />
+      <input v-model="newEmail" placeholder="Email" style="display:block; margin-bottom:8px; width:100%;" />
+      <button @click="handleCreateUser">Создать</button>
+      <p style="margin-top:8px;">{{ createUserResult }}</p>
+    </div>
+
+    <!-- БЛОК СОЗДАНИЯ МАГАЗИНА -->
+    <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
       <h3>Создать магазин</h3>
-      <input v-model="storeName" placeholder="Название магазина" />
+      <input v-model="storeName" placeholder="Название магазина" style="display:block; margin-bottom:8px; width:100%;" />
       <button @click="handleCreateStore">Создать магазин</button>
-      <p>{{ createStoreResult }}</p>
+      <p style="margin-top:8px;">{{ createStoreResult }}</p>
     </div>
 
-    <div v-if="token">
-      <p><strong>Текущий токен:</strong> {{ token }}</p>
+    <!-- Для отладки: показываем текущий токен -->
+    <div v-if="token" style="background:#f0f0f0; padding:10px; border-radius:4px;">
+      <strong>Токен:</strong> {{ token }}
     </div>
   </div>
 </template>
