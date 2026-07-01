@@ -6,15 +6,27 @@ const newUserName = ref('');
 const newUserPassword = ref('');
 const newUserEmail = ref('');
 
-const loginEmail = ref("");
-const loginPassword = ref("");
-const token = ref("");
+const loginEmail = ref('');
+const loginPassword = ref('');
+const token = ref('');
 
+const storeIdForGet = ref('');
+const storeIdForDelete = ref(''); 
 const storeName = ref('');
+
 const createStoreResult = ref('');
+const getStoreResult = ref('');
+const deleteStoreResult = ref('');
+const listStoresResult = ref('');
+
+const loginResult = ref('');
 const userResult = ref('');
 
 async function handleCreateUser() {
+  if (!newUserName.value || !newUserPassword.value || !newUserEmail.value) {
+    userResult.value = 'Заполните все поля для создания пользователя';
+    return;
+  }
   try {
     const result = await invoke('create_user', {
       name: newUserName.value,
@@ -29,19 +41,31 @@ async function handleCreateUser() {
 }
 
 async function handleLogin() {
+  if (!loginEmail.value || !loginPassword.value) {
+    loginResult.value = 'Введите email и пароль';
+    return;
+  }
   try {
     const result = await invoke('login', { 
       email: loginEmail.value, 
       password: loginPassword.value
     });
     token.value = result as string;
-    userResult.value = `Успешный вход! Токен: ${token.value}`;
+    loginResult.value = `Успешный вход! Токен получен.`;
   } catch (error) {
-    userResult.value = `Ошибка входа: ${error}`;
+    loginResult.value = `Ошибка входа: ${error}`;
   }
 }
 
 async function handleCreateStore() {
+  if (!token.value) {
+    createStoreResult.value = 'Сначала войдите в систему';
+    return;
+  }
+  if (!storeName.value) {
+    createStoreResult.value = 'Введите название магазина';
+    return;
+  }
   try {
     const result = await invoke('create_store', {
       token: token.value,
@@ -52,13 +76,70 @@ async function handleCreateStore() {
     createStoreResult.value = `Ошибка: ${error}`;
   } 
 }
+
+async function handleGetStore() {
+  if (!token.value) {
+    getStoreResult.value = 'Сначала войдите в систему';
+    return;
+  }
+  const id = Number(storeIdForGet.value);
+  if (!storeIdForGet.value || isNaN(id) || id <= 0) {
+    getStoreResult.value = 'Введите корректный числовой ID магазина';
+    return;
+  }
+  try {
+    const result = await invoke('get_store', {
+      token: token.value,
+      id: id
+    });
+    getStoreResult.value = `Магазин: ${JSON.stringify(result)}`;
+  } catch (error) {
+    getStoreResult.value = `Ошибка: ${error}`;
+  }
+}
+
+async function handleDeleteStore() {
+  if (!token.value) {
+    deleteStoreResult.value = 'Сначала войдите в систему';
+    return;
+  }
+    const id = Number(storeIdForDelete.value);
+  if (!storeIdForGet.value || isNaN(id) || id <= 0) {
+    deleteStoreResult.value = 'Введите корректный числовой ID магазина';
+    return;
+  }
+  try {
+    await invoke('delete_store', {
+      token: token.value,
+      id: id
+    });
+    deleteStoreResult.value = 'Магазин удалён';
+  } catch (error) {
+    deleteStoreResult.value = `Ошибка: ${error}`;
+  }
+}
+
+async function handleListStores() {
+  if (!token.value) {
+    listStoresResult.value = 'Сначала войдите в систему';
+    return;
+  }
+  try {
+    const result = await invoke('list_stores', {
+      token: token.value,
+    });
+    listStoresResult.value = `Список магазинов: ${JSON.stringify(result)}`;
+  } catch (error) {
+    listStoresResult.value = `Ошибка: ${error}`;
+  }
+}
 </script>
 <template>
   <div style="padding: 20px; font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-    <h1>📦 Заказы</h1>
+    <h1>Заказы</h1>
 
     <!-- БЛОК ЛОГИНА -->
-    <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+    <div style="border: 1px solid #ccc; padding: 45px; margin-bottom: 20px; border-radius: 8px;">
       <h3>Вход</h3>
       <input v-model="loginEmail" placeholder="Email" style="display:block; margin-bottom:8px; width:100%;" />
       <input v-model="loginPassword" placeholder="Пароль" type="password" style="display:block; margin-bottom:8px; width:100%;" />
@@ -67,21 +148,38 @@ async function handleCreateStore() {
     </div>
 
     <!-- БЛОК СОЗДАНИЯ ПОЛЬЗОВАТЕЛЯ -->
-    <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+    <div style="border: 1px solid #ccc; padding: 45px; margin-bottom: 20px; border-radius: 8px;">
       <h3>Создать пользователя</h3>
-      <input v-model="newName" placeholder="Имя" style="display:block; margin-bottom:8px; width:100%;" />
-      <input v-model="newPassword" placeholder="Пароль" type="password" style="display:block; margin-bottom:8px; width:100%;" />
-      <input v-model="newEmail" placeholder="Email" style="display:block; margin-bottom:8px; width:100%;" />
+      <input v-model="newUserName" placeholder="Имя" style="display:block; margin-bottom:8px; width:100%;" />
+      <input v-model="newUserPassword" placeholder="Пароль" type="password" style="display:block; margin-bottom:8px; width:100%;" />
+      <input v-model="newUserEmail" placeholder="Email" style="display:block; margin-bottom:8px; width:100%;" />
       <button @click="handleCreateUser">Создать</button>
-      <p style="margin-top:8px;">{{ createUserResult }}</p>
+      <p style="margin-top:8px;">{{ userResult }}</p>
     </div>
 
-    <!-- БЛОК СОЗДАНИЯ МАГАЗИНА -->
-    <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+    <!-- БЛОК МАГАЗИНА -->
+    <div style="border: 1px solid #ccc; padding: 45px; margin-bottom: 20px; border-radius: 8px;">
       <h3>Создать магазин</h3>
       <input v-model="storeName" placeholder="Название магазина" style="display:block; margin-bottom:8px; width:100%;" />
       <button @click="handleCreateStore">Создать магазин</button>
       <p style="margin-top:8px;">{{ createStoreResult }}</p>
+    </div>
+    <div style="border: 1px solid #ccc; padding: 45px; margin-bottom: 20px; border-radius: 8px;">
+      <h3>Посмотреть магазин</h3>
+      <input v-model="storeIdForGet" placeholder="ID магазина" style="display:block; margin-bottom:8px; width:100%;" />
+      <button @click="handleGetStore">Посмотреть магазин</button>
+      <p style="margin-top:8px;">{{ getStoreResult }}</p>
+    </div>
+    <div style="border: 1px solid #ccc; padding: 45px; margin-bottom: 20px; border-radius: 8px;">
+      <h3>Удалить магазин</h3>
+      <input v-model="storeIdForDelete" placeholder="ID магазина" style="display:block; margin-bottom:8px; width:100%;" />
+      <button @click="handleDeleteStore">Удалить магазин</button>
+      <p style="margin-top:8px;">{{ deleteStoreResult }}</p>
+    </div>
+    <div style="border: 1px solid #ccc; padding: 45px; margin-bottom: 20px; border-radius: 8px;">
+      <h3>Список магазинов</h3>
+      <button @click="handleListStores">Список магазинов</button>
+      <p style="margin-top:8px;">{{ listStoresResult }}</p>
     </div>
 
     <!-- Для отладки: показываем текущий токен -->
@@ -161,7 +259,7 @@ input,
 button {
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding: 10px 10px;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
