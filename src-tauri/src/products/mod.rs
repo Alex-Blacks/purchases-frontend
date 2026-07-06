@@ -7,6 +7,7 @@ use crate::AppState;
 pub struct CreateProductRequest {
 	pub title: String,
     pub unit: String,
+    #[serde(rename = "categoryId")]
 	pub category_id: u64
 }
 
@@ -25,7 +26,14 @@ pub struct CreateProductAliasRequest {
 
 #[derive(Debug,Deserialize,Serialize,Clone)]
 pub struct CreateProductAliasResponse {
-	pub alias_id: u64
+	pub id: u64,
+	pub product: String,
+	pub alias: String
+}
+
+#[derive(Serialize)]
+pub struct AliasQuery {
+    pub alias: String
 }
 
 #[derive(Debug,Deserialize,Serialize,Clone)]
@@ -75,6 +83,15 @@ impl ApiClient {
         let products: Vec<ProductResponse> = response.json().await?;
         Ok(products)
     }
+    pub async fn find_product_by_alias(&self, token: &str, alias: String) -> anyhow::Result<ProductFindResponse> {
+        let url = format!("{}/api/private/products/by-alias", self.base_url);
+
+        let query = AliasQuery { alias };
+        let response = self.client.get(&url).query(&query).bearer_auth(token).send().await?;
+        let response = Self::check_status(response).await?;
+        let product: ProductFindResponse = response.json().await?;
+        Ok(product)
+    }
     
     // PRODUCT ALIAS
 
@@ -84,6 +101,7 @@ impl ApiClient {
 
         let response = self.client.post(&url).json(&product_alias_data).bearer_auth(token).send().await?;
         let response = Self::check_status(response).await?;
+
         let product_alias: CreateProductAliasResponse = response.json().await?;
         Ok(product_alias)
     }
@@ -120,14 +138,6 @@ impl ApiClient {
         let products_aliases: Vec<ProductAliasResponse> = response.json().await?;
         Ok(products_aliases)
     }
-    pub async fn find_product_by_alias(&self, token: &str, alias: String) -> anyhow::Result<ProductFindResponse> {
-        let url = format!("{}/api/private/products/by-alias", self.base_url);
-
-        let response = self.client.get(&url).query(&alias).bearer_auth(token).send().await?;
-        let response = Self::check_status(response).await?;
-        let product: ProductFindResponse = response.json().await?;
-        Ok(product)
-    }
 }
 
 #[tauri::command]
@@ -142,7 +152,7 @@ pub async fn get_product(state: tauri::State<'_,AppState>, token: String, id: u6
 
 #[tauri::command]
 pub async fn delete_product(state: tauri::State<'_,AppState>, token: String, id: u64) -> Result<String, String> {
-    state.client.delete_category(&token, id).await.map_err(|e|e.to_string())
+    state.client.delete_product(&token, id).await.map_err(|e|e.to_string())
 }
 
 #[tauri::command]

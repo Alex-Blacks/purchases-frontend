@@ -11,7 +11,6 @@ const productCategoryID = ref('');
 
 const productIDForGet = ref('');
 const productIDForDelete = ref('');
-const productIDForFinc = ref('');
 
 const productAlias = ref('');
 const productIDForAlias = ref('');
@@ -52,7 +51,7 @@ async function handleCreateProduct() {
             token: token.value,
             title: productTitle.value,
             unit: productUnit.value,
-            category_id: categoryID
+            categoryId: categoryID
         });
         createProductResult.value = `Продукт создан: ${JSON.stringify(result)}`;
     } catch ( error ) {
@@ -122,18 +121,12 @@ async function handleFindProductByAlias() {
         findProductByAliasResult.value = 'Сначала войдите в систему';
         return;
     }
-    const productID = Number(productIDForFinc.value);
-    if(!productIDForFinc.value || isNaN(productID) || productID<=0) {
-        findProductByAliasResult.value = 'Введите корректный числовой ID продукта';
-        return;
-    }
     if(!aliasForFind.value){
         findProductByAliasResult.value = 'Введите алиас'
     }
     try {
         const result = await invoke('find_product_by_alias', {
             token: token.value,
-            product_id: productID,
             alias: aliasForFind.value
         });
         findProductByAliasResult.value = `Продукт: ${JSON.stringify(result)}`;
@@ -150,14 +143,14 @@ async function handleCreateProductAlias() {
         return;
     }
     const productID = Number(productIDForAlias.value)
-    if(!productAlias.value || isNaN(productID) || productID<= 0) {
+    if(!productIDForAlias.value || isNaN(productID) || productID<= 0) {
         createProductAliasResult.value = 'Введите все данные или проверьте их корректность';
         return;
     }
     try {
         const result = await invoke('create_product_alias', {
             token: token.value,
-            product_id: productID,
+            productId: productID,
             alias: productAlias.value
         });
         createProductAliasResult.value = `Алиас создан: ${JSON.stringify(result)}`;
@@ -172,7 +165,7 @@ async function handleGetProductAlias() {
         return;
     }
     const productID = Number(productIDForAlias.value);
-    if(!productIDForGet.value || isNaN(productID) || productID<=0) {
+    if(!productIDForAlias.value || isNaN(productID) || productID<=0) {
         getProductAliasResult.value = 'Введите корректный числовой ID продукта';
         return;
     }
@@ -184,7 +177,7 @@ async function handleGetProductAlias() {
     try {
         const result = await invoke('get_product_alias', {
             token: token.value,
-            product_id: productID,
+            productId: productID,
             id: id
         });
         getProductAliasResult.value = `Алиас: ${JSON.stringify(result)}`;
@@ -211,7 +204,7 @@ async function handleDeleteProductAlias() {
     try {
         await invoke('delete_product_alias', {
             token: token.value,
-            product_id: productID,
+            productId: productID,
             id: id
         });
         deleteProductAliasResult.value = `Алиас удалён`;
@@ -233,7 +226,7 @@ async function handleDeleteAllProductAliases() {
     try {
         await invoke('delete_all_product_aliases', {
             token: token.value,
-            product_id: productID
+            productId: productID
         });
         deleteAllProductAliasResult.value = `Все алиасы продукта удалены`;
     } catch ( error ) {
@@ -254,7 +247,7 @@ async function handleListProductAliases() {
     try {
         const result = await invoke('list_product_aliases', {
             token: token.value,
-            product_id: productID
+            productId: productID
         });
         listProductAliasResult.value = `Список продуктов: ${JSON.stringify(result)}`;
     } catch ( error ) {

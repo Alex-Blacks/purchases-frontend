@@ -2,7 +2,6 @@
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { useAuth } from "../composables/useAuth";
-import AppTabs from "../components/AppTabs.vue";
 
 const { token } = useAuth();
 const categoryName = ref('');

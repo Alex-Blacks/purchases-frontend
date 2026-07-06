@@ -7,12 +7,16 @@ const password = ref('')
 const error = ref('')
 const { login } = useAuth()
 
+const loginResult = ref('')
+
 async function handleLogin() {
     try {
         await login(email.value, password.value)
         error.value = ''
+        loginResult.value = 'Логин успешен'
     } catch (e: any) {
         error.value = e.message
+        loginResult.value = 'Ошибка'
     }
 }
 </script>
@@ -30,6 +34,7 @@ async function handleLogin() {
       <input v-model="email" placeholder="Email" style="display:block; margin-bottom:8px; width:100%;" />
       <input v-model="password" placeholder="Пароль" type="password" style="display:block; margin-bottom:8px; width:100%;" />
       <button @click="handleLogin">Войти</button>
+      <p style="margin-top: 8px;">{{ loginResult }}</p>
     </div>
   </div>
 </template>
