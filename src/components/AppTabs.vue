@@ -21,6 +21,13 @@
     >
       Категории
     </router-link>
+    <router-link
+      to="/products"
+      class="tab"
+      active-class="tab-active"
+    >
+      Продукты
+    </router-link>
     <router-link 
       to="/users" 
       class="tab" 

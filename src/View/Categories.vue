@@ -66,11 +66,11 @@ async function handleDeleteCategory() {
         return;
     }
     try {
-        const result = await invoke('delete_category', {
+        await invoke('delete_category', {
             token: token.value,
             id: id
         });
-        deleteCategoryResult.value = `Категория: ${JSON.stringify(result)}`;
+        deleteCategoryResult.value = `Категория удалена`;
     } catch( error ) {
         deleteCategoryResult.value = `Ошибка: ${error}`;
     }

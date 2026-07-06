@@ -16,9 +16,9 @@ pub struct CategoryResponse{
 impl ApiClient {
     pub async fn create_category(&self, token: &str, name: String) -> anyhow::Result<CategoryResponse> {
         let url = format!("{}/api/private/categories", self.base_url);
-        let store_data = CreateCategoryRequest { name };
+        let category_data = CreateCategoryRequest { name };
 
-        let response = self.client.post(&url).json(&store_data).bearer_auth(token).send().await?;
+        let response = self.client.post(&url).json(&category_data).bearer_auth(token).send().await?;
         let response = Self::check_status(response).await?;
         let category: CategoryResponse = response.json().await?;
         Ok(category)
