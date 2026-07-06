@@ -1,4 +1,5 @@
 mod stores;
+mod categories;
 mod users;
 mod api;
 use api::ApiClient;
@@ -22,6 +23,10 @@ pub fn run() {
             stores::get_store,
             stores::delete_store,
             stores::list_stores,
+            categories::create_category,
+            categories::get_category,
+            categories::delete_category,
+            categories::list_categories,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

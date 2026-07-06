@@ -14,6 +14,13 @@
     >
       Магазины
     </router-link>
+    <router-link
+      to="/categories"
+      class="tab"
+      active-class="tab-active"
+    >
+      Категории
+    </router-link>
     <router-link 
       to="/users" 
       class="tab" 

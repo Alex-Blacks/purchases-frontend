@@ -31,10 +31,6 @@ async function handleCreateUser() {
 </script>
 
 <template>
-    <div id="app">
-        <AppTabs />
-        <router-view />
-    </div>
     <div style="padding: 20px; font-family: sans-serif; max-width: 600px; margin: 0 auto;">
         <h1>Пользователи</h1>
 

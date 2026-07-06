@@ -52,13 +52,6 @@ impl ApiClient {
 
 #[tauri::command]
 pub async fn login(
-    state: tauri::State<'_, AppState>,
-    email: String,
-    password: String,
-) -> Result<String, String> {
-    state
-        .client
-        .login(&email,&password)
-        .await
-        .map_err(|e| e.to_string())
+    state: tauri::State<'_, AppState>, email: String, password: String) -> Result<String, String> {
+        state.client.login(&email,&password).await.map_err(|e| e.to_string())
 }
