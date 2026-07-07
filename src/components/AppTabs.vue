@@ -29,6 +29,13 @@
       Продукты
     </router-link>
     <router-link 
+      to="/orders" 
+      class="tab" 
+      active-class="tab-active"
+    >
+      Заказы
+    </router-link>
+    <router-link 
       to="/users" 
       class="tab" 
       active-class="tab-active"
