@@ -104,7 +104,7 @@
         }
     }
 
-     async function handlerAddItem() {
+    async function handlerAddItem() {
         if(!token.value) {
             addItemResult.value = 'Сначала войдите в систему';
             return;
@@ -186,12 +186,12 @@
             return;
         }
         try {
-            const result = await invoke('delete_item', {
+            await invoke('delete_item', {
                 token: token.value,
                 orderId: orderID,
                 productId: productID
             });
-            deleteItemResult.value = `Товар удалён: ${JSON.stringify(result)}`;
+            deleteItemResult.value = `Товар удалён`;
         }catch ( error ) {
             deleteItemResult.value = `Ошибка: ${error}`;
         }

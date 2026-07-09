@@ -5,7 +5,7 @@ import { useAuth } from '../composables/useAuth'
 const email = ref('')
 const password = ref('')
 const error = ref('')
-const { login } = useAuth()
+const { login, logout } = useAuth()
 
 const loginResult = ref('')
 
@@ -18,6 +18,12 @@ async function handleLogin() {
         error.value = e.message
         loginResult.value = 'Ошибка'
     }
+}
+
+async function handleLogout() {
+  logout(); 
+  
+  alert('Вы вышли из системы');
 }
 </script>
 
@@ -34,6 +40,7 @@ async function handleLogin() {
       <input v-model="email" placeholder="Email" style="display:block; margin-bottom:8px; width:100%;" />
       <input v-model="password" placeholder="Пароль" type="password" style="display:block; margin-bottom:8px; width:100%;" />
       <button @click="handleLogin">Войти</button>
+      <button @click="handleLogout">Выйти</button>
       <p style="margin-top: 8px;">{{ loginResult }}</p>
     </div>
   </div>

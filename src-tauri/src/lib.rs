@@ -21,6 +21,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             api::login,
             users::create_user,
+            users::get_user,
+            users::delete_user,
+            users::update_user,
+            users::list_users,
             stores::create_store,
             stores::get_store,
             stores::delete_store,
