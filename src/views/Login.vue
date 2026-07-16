@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuth } from "../composables/useAuth";
 
-const email = ref('')
-const password = ref('')
-const router = useRouter()
+const email = ref('');
+const password = ref('');
+const router = useRouter();
+const auth = useAuth();
 
 const handleLogin = async () => {
-    // Временно просто выведем в консоль
-    console.log('Login:', email.value, password.value)
-    // Позже заменим на реальный вызов API
-    // После успешного входа сделаем редирект на главную
-    // router.push('/')
+    try {
+        await auth.login(email.value,password.value);
+        router.push('/dashboard');
+    } catch ( error ) {
+        console.log(`[ERROR] Login: ${error}`);
+        throw new Error(`Ошибка: ${error}`);
+    }
 }
 </script>
 
@@ -46,7 +50,7 @@ const handleLogin = async () => {
                 <button 
                     type="submit"
                     class="w-full px-4 py-2 font-medium text-white transition duration-150 bg-teal-500 rounded-lg shadow-sm hover:bg-teal-600 hover:shadow-md"
-                >
+                > 
                     Войти
                 </button>    
             </form>

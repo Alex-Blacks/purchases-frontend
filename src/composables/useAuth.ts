@@ -31,7 +31,7 @@ async function logout() {
 
 async function initAuth() {
     token.value = localStorage.getItem('token');
-    isAuthenticated.value = true;
+    isAuthenticated.value = !!token.value;
 }
 
 export function useAuth() {

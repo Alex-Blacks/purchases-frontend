@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useAuth } from "../composables/useAuth";
 
 const name = ref('');
 const email = ref('');
 const password = ref('');
 const passwordConfirmation = ref('');
 const router = useRouter();
+const auth = useAuth();
 
 const passwordMatch = computed(() => {
     return password.value === passwordConfirmation.value;
@@ -17,7 +19,13 @@ const handleRegister = async () => {
         alert('Пароли не совпадают!');
         return;
     }
-    console.log('Регистрация:', { name: name.value, email: email.value, password: password.value })
+    try {
+        await auth.register(name.value, email.value, password.value);
+        router.push('/');
+    } catch ( error ) {
+        console.log(`[ERROR] Register: ${error}`);
+        throw new Error(`Ошибка: ${error}`);
+    }
 }
 
 </script>
