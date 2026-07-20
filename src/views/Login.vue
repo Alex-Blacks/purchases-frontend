@@ -11,7 +11,7 @@ const auth = useAuth();
 const handleLogin = async () => {
     try {
         await auth.login(email.value,password.value);
-        router.push('/dashboard');
+        router.push('/');
     } catch ( error ) {
         console.log(`[ERROR] Login: ${error}`);
         throw new Error(`Ошибка: ${error}`);

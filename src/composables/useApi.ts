@@ -21,6 +21,10 @@ export function useApi() {
         }
     }
 
+    async function listOrders() {
+        return call<any[]>('list_orders');  
+    }
+
     async function createUser(name: string, password: string, email: string, role: string) {
         return call('create_user', { name, password, email, role});  
     }
@@ -42,6 +46,7 @@ export function useApi() {
     }
 
     return {
+        listOrders,
         createUser,
         getUser,
         deleteUser,
