@@ -25,6 +25,7 @@ async function register(name: string, email: string, password: string) {
 }
 
 async function logout() {
+    localStorage.setItem('token', '')
     token.value = '';
     isAuthenticated.value = false;
 }
