@@ -12,8 +12,7 @@ pub struct CreateOrderRequest {
 #[derive(Debug,Deserialize,Serialize,Clone)]
 pub struct OrderResponse {
 	pub id: u64,
-    #[serde(rename = "userId")]
-	pub user_id: u64,
+	pub user: String,
 	pub store: String,
     #[serde(rename = "itemsCount")]
 	pub items_count: u64,
@@ -26,8 +25,7 @@ pub struct OrderResponse {
 #[derive(Debug,Deserialize,Serialize,Clone)]
 pub struct OrderWithItemResponse {
 	pub id: u64,
-    #[serde(rename = "userId")]
-	pub user_id: u64,
+	pub user: String,
 	pub store: String,
     #[serde(rename = "itemsCount")] 
 	pub items_count: u64,
@@ -53,8 +51,6 @@ pub struct ItemUpdateRequest {
 #[derive(Debug,Deserialize,Serialize,Clone)]
 pub struct ItemResponse {
 	pub id: u64,
-    #[serde(rename = "productId")]
-	pub product_id: u64,
 	pub title: String,
 	pub quantity: u64,
 }

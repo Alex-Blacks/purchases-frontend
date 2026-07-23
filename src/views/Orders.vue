@@ -1,42 +1,46 @@
 <script setup lang="ts">
-    import { ref, onMounted } from "vue";
-    import { useApi } from "../composables/useApi";
+import { format } from "date-fns";
+import { ref, onMounted } from "vue";
+import { useApi } from "../composables/useApi";
+import { } from "../components/orders/CreateOrderModal.vue";
+import { ru } from "date-fns/locale";
 
-    const api = useApi();
-    const loading = ref(false);
-    const error = ref('');
-    const orders = ref<any>();
-    
-    onMounted(async () => {
-        loading.value = true;
-        error.value = '';
-        try{
-            const data = await api.listOrders();
-            orders.value = data;
-        } catch (err:any) {
-            error.value = err.message || 'Ошибка загрузки заказа';
-        } finally {
-            loading.value = false
-        }
-    })
+const api = useApi();
+const loading = ref(false);
+const error = ref('');
+const orders = ref<any>();
 
-    function formatDate(dateString: string) {
-    const date = new Date(dateString)
-    return date.toLocaleString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    })
+const isModalOpen = ref(false);
+
+onMounted(async () => {
+    loading.value = true;
+    error.value = '';
+    try{
+        const data = await api.listOrders();
+        orders.value = data;
+    } catch (err:any) {
+        error.value = err.message || `Ошибка загрузки заказа: ${JSON.stringify(err)}`;
+    } finally {
+        loading.value = false
+    }
+})
+
+function formatDate(dateString: string) {
+    return format(new Date(dateString), 'dd-MM-yyyy HH:mm', { locale: ru })
 }
 </script>
+
 <template>
     <div class="flex flex-col min-h-screen bg-gray-50">
         <header class="top-0 left-0 right-0 flex items-center justify-between h-16 px-4 bg-white border-b shadow-sm ">
             <div class="text-lg font-semibold text-gray-800">Мои заказы</div>
             <div>
-                <button class="">Создать новый заказ</button>
+                <button
+                    @click="isModalOpen = true"
+                    class="text-gray-800 bg-gray-300 rounded-lg hover:text-teal-500"
+                >
+                    Создать заказ
+                </button>
             </div>
         </header>
         <div class="flex flex-1 pt-4 top-16">
@@ -61,7 +65,7 @@
                     <tbody class="divide-y divide-gray-200 ">
                         <tr v-for="order in orders" :key="order.id">
                             <td class="px-6 py-4 text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">{{ order.id }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">{{ order.userId }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">{{ order.user }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">{{ order.store }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">{{ order.itemsCount }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900 border-r border-gray-200 whitespace-nowrap">{{ formatDate(order.createdAt) }}</td>

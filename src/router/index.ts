@@ -10,6 +10,8 @@ import Stores from '../views/Stores.vue';
 import Settings from '../views/Settings.vue';
 import MainLayot from "../layouts/MainLayout.vue";
 
+import CreateOrder from "../views/CreateOrderModal.vue";
+
 
 const routes = [
     { path: '/login', component: Login, meta: { requiresAuth: false }},
@@ -26,7 +28,8 @@ const routes = [
             { path: '/products', component: Products },
             { path: '/categories', component: Categories },
             { path: '/stores', component: Stores }, 
-            { path: '/settings', component: Settings },                                   
+            { path: '/settings', component: Settings },        
+            { path: '/create_order', component: CreateOrder },                              
         ]
     },
     
